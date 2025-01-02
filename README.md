@@ -34,8 +34,8 @@ Este é um programa desenvolvido em C para gerenciamento básico de produtos em 
 2. Compile o programa:  
    ```bash
    gcc main.c -o main
+3. Execute o programa:
    ```bash
-   Execute o programa:
    ./main
    
 ### No Windows:
@@ -43,8 +43,8 @@ Este é um programa desenvolvido em C para gerenciamento básico de produtos em 
 2. Compile o programa:  
    ```bash
    gcc main.c -o main.exe
+3. Execute o programa:
    ```bash
-   Execute o programa:
    ./main.exe
 
 ## Notas
