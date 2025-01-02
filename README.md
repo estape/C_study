@@ -28,15 +28,6 @@ Este é um programa desenvolvido em C para gerenciamento básico de produtos em 
   Qualquer compilador compatível com C (como GCC no Linux ou MinGW no Windows).  
 
 ## Compilação e Execução
-
-### No Linux:
-1. Abra o terminal e navegue até o diretório do programa.
-2. Compile o programa:  
-   ```bash
-   gcc main.c -o main
-3. Execute o programa:
-   ```bash
-   ./main
    
 ### No Windows:
 1. Abra o PowerShell ou CMD e navegue até o diretório do programa.
