@@ -37,15 +37,6 @@ Este é um programa desenvolvido em C para gerenciamento básico de produtos em 
 3. Execute o programa:
    ```bash
    ./main
-   
-### No Windows:
-1. Abra o PowerShell ou CMD e navegue até o diretório do programa.
-2. Compile o programa:  
-   ```bash
-   gcc main.c -o main.exe
-3. Execute o programa:
-   ```bash
-   ./main.exe
 
 ## Notas
 - O programa armazena os dados dos produtos no arquivo products.bin. Certifique-se de que você tenha permissão de leitura e escrita no diretório onde o programa será executado.
