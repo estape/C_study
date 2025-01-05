@@ -267,14 +267,30 @@ void colorForeground(int frontColor) {
 void registerProduct()
 {
     struct product productRef;
-    char buffer[50];
+    int bufferInt = 0;
 
     ClearScreen();
     printf("Cadastro de Produtos\n\n");
 
-    printf("Código do produto: ");
-    scanf("%d", &productRef.code);
+    printf("Código do produto (Máximo 50 caracteres)\n\nPara retornar ao menu principal, digite 0\n\n");
+    printf("Digite o código do produto: ");
+    scanf("%d", &bufferInt);
 
+    if(bufferInt == 0) {
+        clearInputBuffer();
+        MainMenu();
+        return;
+    }
+    else if (bufferInt < 0) {
+        printf("O código não pode ser 0 (zero). Tente outro código.\n");
+        clearInputBuffer();
+        getchar();
+        registerProduct();
+    }
+    else {
+        productRef.code = bufferInt;
+    }
+    
     clearInputBuffer();
 
     printf("Digite o nome do produto: ");
@@ -337,7 +353,8 @@ void sellProduct() {
     int op = 0;
     int code = 0;
     char name[50];
-    char buffer [50];
+    char buffer [1];
+    int saleAmount = 0;
     FILE *fileRef = fopen("products.bin", "r");
     struct product productRef;
     struct product productsList[0];
@@ -350,15 +367,8 @@ void sellProduct() {
         return; // Encerra a função
     }
 
-    printf("1 - Venda por código\n2 - Venda por nome\n3 - Retornar ao menu principal\n\n");
-
-    printf("Digite a opcao desejada: ");
-    scanf("%d", &op);
-
-    switch (op) {
-    case 1:
-        ClearScreen();
-        printf("Venda de Produtos - venda por código\n\nPara retornar ao menu principal, digite 0\n\n");
+    ClearScreen();
+        printf("Venda de Produtos\n\nPara retornar ao menu principal, digite 0\n\n");
 
         while (1)
         {
@@ -390,51 +400,49 @@ void sellProduct() {
 
             if (found)
             {
-                // Aqui você pode adicionar a lógica para processar a venda do produto
-                break; // Sai do loop se o produto foi encontrado
-            }
-            else
-            {
-                printf("Produto não encontrado. Tente novamente.\n");
-            }
-        }
-        break;
-    case 2:
-        ClearScreen();
-        printf("Venda de Produtos - venda por código\n\n");
+                printf("Digite a quantidade de vendas: ");
+                scanf("%d", &saleAmount);
 
-        while (1)
-        {
-            printf("Digite o nome do produto: ");
-            scanf("%s", name);
+                printf("Quantidade a ser vendida: %d\nConfirma? (S/N)", saleAmount);
+                scanf("%s", buffer);
 
-            if(code == 0) {
-                ClearScreen();
-                clearInputBuffer();
-                MainMenu();
-                break;
-            }
-
-            int found = 0;
-            rewind(fileRef); // Volta ao início do arquivo para nova busca
-
-            while (fread(&productRef, sizeof(struct product), 1, fileRef))
-            {
-                if (strcmp(productRef.name, name))
-                {
-                    printf("Produto encontrado!\n");
-                    printf("Código: %d\n", productRef.code);
-                    printf("Nome: %s\n", productRef.name);
-                    printf("Preço: R$ %.2f\n", productRef.price);
-                    printf("Quantidade: %d\n\n", productRef.amount);
-                    found = 1;
-                    break;
+                if(buffer[0] == 'n' || buffer[0] == 'N') {
+                    continue;
                 }
-            }
+                else if(buffer[0] != 's' && buffer[0] != 'S') {
+                    printf("Opção inválida. Tente novamente.\n");
+                    continue;
+                }
 
-            if (found)
-            {
-                // Aqui você pode adicionar a lógica para processar a venda do produto
+                if (saleAmount <= productRef.amount)
+                {
+                    productRef.amount -= saleAmount;
+                    FILE *tempFile = fopen("temp.bin", "w");
+                    rewind(fileRef); // Volta ao início do arquivo original
+
+                    struct product tempProduct;
+                    while (fread(&tempProduct, sizeof(struct product), 1, fileRef))
+                    {
+                        if (tempProduct.code == productRef.code)
+                        {
+                            tempProduct.amount = productRef.amount;
+                        }
+                        fwrite(&tempProduct, sizeof(struct product), 1, tempFile);
+                    }
+
+                    fclose(fileRef);
+                    fclose(tempFile);
+
+                    remove("products.bin");
+                    rename("temp.bin", "products.bin");
+
+                    printf("Venda realizada com sucesso!\n");
+                }
+                else
+                {
+                    printf("Quantidade insuficiente em estoque. Tente novamente.\n");
+                    continue;
+                }
                 break; // Sai do loop se o produto foi encontrado
             }
             else
@@ -442,20 +450,6 @@ void sellProduct() {
                 printf("Produto não encontrado. Tente novamente.\n");
             }
         }
-        break;
-    case 3:
-        ClearScreen();
-        MainMenu();
-        break;
-    default:
-        printf("Opcao invalida, pressione qualquer tecla para tentar novamente\n");
-        clearInputBuffer();
-        ClearScreen();
-        sellProduct();
-        break;
-    }
-
-    MainMenu();
 }
 
 void MainMenu()
@@ -488,13 +482,14 @@ void MainMenu()
             sellProduct();
             break;
         case 4:
-            printf("Relatorios\n");
+            MainMenu();
             break;
         case 5:
             printf("Saindo...\n");
             ClearScreen();
             colorBackground(0);
             colorForeground(0);
+            return;
             break;
         default:
             printf("Opcao invalida\n");
